@@ -52,90 +52,93 @@ public class BookServiceimpl implements BookService {
 
 	@Override
 	public BookResponse alterData(BookRequest req) {
-		
-		
-		//基本資料
-		String reqisbn = req.getIsbn();
-		String reqname = req.getName();
-		String reqauthor = req.getAuthor();
-		
-		//request update info
-		String newreqisbn = req.getNewIsbn();
-		String newAuthor = req.getNewAuthor();
-		String newName = req.getNewName();
-		String newclassify = req.getNewclassify();
-		
 
 		
-		Integer reqprice = req.getPrice();
-		Integer reqstock = req.getStock();
-		Integer reqsaleAmount = req.getSaleAmount();
-		String reqclassify = req.getClassify();
+			
+			
+			//基本資料
+			String reqisbn = req.getIsbn();
+			String reqname = req.getName();
+			String reqauthor = req.getAuthor();
+			
+			//request update info
+			String newreqisbn = req.getNewIsbn();
+			String newAuthor = req.getNewAuthor();
+			String newName = req.getNewName();
+			String newclassify = req.getNewclassify();
+			
 
-		if (!StringUtils.hasText(reqisbn) || !StringUtils.hasText(reqname) || !StringUtils.hasText(reqauthor)) {
-			return new BookResponse("404,name,ISBN,author,classify is empty");
+			
+			Integer reqprice = req.getPrice();
+			Integer reqstock = req.getStock();
+			Integer reqsaleAmount = req.getSaleAmount();
+			String reqclassify = req.getClassify();
+
+			if (!StringUtils.hasText(reqisbn) || !StringUtils.hasText(reqname) || !StringUtils.hasText(reqauthor)) {
+				return new BookResponse("404,name,ISBN,author,classify is empty");
+			}
+
+			Optional<Book> op = bookdao.findById(reqisbn);
+			if (!op.isPresent()) {
+				return new BookResponse("404,object is null");
+			}
+			Book result = op.get();// 獲取單筆資料改
+//			result.setAuthor(reqauthor);
+//			result.setClassify(reqclassify);
+//			result.setName(reqname);
+//			result.setPrice(reqprice);
+//			result.setSaleAmount(reqsaleAmount);
+//			result.setStock(reqstock);
+
+			if (existed(req, result) && (StringUtils.hasText(newAuthor))) {
+				result.setAuthor(newAuthor);
+				bookdao.save(result);
+			}
+
+			if (existed(req, result) && (StringUtils.hasText(newclassify))) {
+				result.setClassify(newclassify);
+				bookdao.save(result);
+			}
+			if (existed(req, result) && (StringUtils.hasText(newName))) {
+				result.setName(newName);
+				bookdao.save(result);
+			}
+			if (existed(req, result) && (StringUtils.hasText(newreqisbn))) {
+				bookdao.deleteById(reqisbn);
+				result.setIsbn(newreqisbn);
+				bookdao.save(result);
+			}
+			if (existednum(req, result)) {
+				result.setPrice(reqprice);
+				bookdao.save(result);
+			}
+			if (existednum(req, result)) {
+				result.setSaleAmount(reqsaleAmount);
+				bookdao.save(result);
+			}
+			if (existednum(req, result)) {
+				result.setStock(reqstock);
+				bookdao.save(result);
+			}
+
+			return new BookResponse("update info");
+
 		}
 
-		Optional<Book> op = bookdao.findById(reqisbn);
-		if (!op.isPresent()) {
-			return new BookResponse("404,object is null");
-		}
-		Book result = op.get();// 獲取單筆資料改
-//		result.setAuthor(reqauthor);
-//		result.setClassify(reqclassify);
-//		result.setName(reqname);
-//		result.setPrice(reqprice);
-//		result.setSaleAmount(reqsaleAmount);
-//		result.setStock(reqstock);
+		private boolean existed(BookRequest req, Book book) {
+			boolean result = StringUtils.hasText(req.getName()) || StringUtils.hasText(req.getAuthor())
+					 || StringUtils.hasText(req.getIsbn());
 
-		if (existed(req, result) && (StringUtils.hasText(newAuthor))) {
-			result.setAuthor(newAuthor);
-			bookdao.save(result);
+			return result;
 		}
 
-		if (existed(req, result) && (StringUtils.hasText(newclassify))) {
-			result.setClassify(newclassify);
-			bookdao.save(result);
-		}
-		if (existed(req, result) && (StringUtils.hasText(newName))) {
-			result.setName(newName);
-			bookdao.save(result);
-		}
-		if (existed(req, result) && (StringUtils.hasText(newreqisbn))) {
-			bookdao.deleteById(reqisbn);
-			result.setIsbn(newreqisbn);
-			bookdao.save(result);
-		}
-		if (existednum(req, result)) {
-			result.setPrice(reqprice);
-			bookdao.save(result);
-		}
-		if (existednum(req, result)) {
-			result.setSaleAmount(reqsaleAmount);
-			bookdao.save(result);
-		}
-		if (existednum(req, result)) {
-			result.setStock(reqstock);
-			bookdao.save(result);
+		private boolean existednum(BookRequest req, Book book) {
+			boolean result = !(req.getPrice() == book.getPrice()) || !(req.getSaleAmount() == book.getSaleAmount())
+					|| !(req.getStock() == book.getStock());
+
+			return result;
 		}
 
-		return new BookResponse("update info");
-
-	}
-
-	private boolean existed(BookRequest req, Book book) {
-		boolean result = StringUtils.hasText(req.getName()) || StringUtils.hasText(req.getAuthor())
-				|| StringUtils.hasText(req.getClassify()) || StringUtils.hasText(req.getIsbn());
-
-		return result;
-	}
-
-	private boolean existednum(BookRequest req, Book book) {
-		boolean result = !(req.getPrice() == book.getPrice()) || !(req.getSaleAmount() == book.getSaleAmount())
-				|| !(req.getStock() == book.getStock());
-
-		return result;
-	}
 
 	@Override
 	public BookResponse muticlassify(BookRequest req) {
