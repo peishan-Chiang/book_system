@@ -52,21 +52,27 @@ public class BookServiceimpl implements BookService {
 
 	@Override
 	public BookResponse alterData(BookRequest req) {
-		String newreqisbn = req.getNewIsbn();
-		 String newAuthor=req.getNewAuthor();
-		 String newName=req.getNewName();
-		 String newclassify=req.getNewclassify();
-		String isbn=req.getNewIsbn();
 		
+		
+		//基本資料
 		String reqisbn = req.getIsbn();
 		String reqname = req.getName();
 		String reqauthor = req.getAuthor();
+		
+		//request update info
+		String newreqisbn = req.getNewIsbn();
+		String newAuthor = req.getNewAuthor();
+		String newName = req.getNewName();
+		String newclassify = req.getNewclassify();
+		
+
+		
 		Integer reqprice = req.getPrice();
 		Integer reqstock = req.getStock();
 		Integer reqsaleAmount = req.getSaleAmount();
 		String reqclassify = req.getClassify();
 
-		if (!StringUtils.hasText(reqisbn)||!StringUtils.hasText(reqname)||!StringUtils.hasText(reqauthor)) {
+		if (!StringUtils.hasText(reqisbn) || !StringUtils.hasText(reqname) || !StringUtils.hasText(reqauthor)) {
 			return new BookResponse("404,name,ISBN,author,classify is empty");
 		}
 
@@ -82,37 +88,36 @@ public class BookServiceimpl implements BookService {
 //		result.setSaleAmount(reqsaleAmount);
 //		result.setStock(reqstock);
 
-		if (existed(req, result)&&(StringUtils.hasText(newAuthor))) {
+		if (existed(req, result) && (StringUtils.hasText(newAuthor))) {
 			result.setAuthor(newAuthor);
-//			bookdao.save(result);
+			bookdao.save(result);
 		}
-		
-		if (existed(req, result)&&(StringUtils.hasText(newclassify))) {
+
+		if (existed(req, result) && (StringUtils.hasText(newclassify))) {
 			result.setClassify(newclassify);
-//			bookdao.save(result);
+			bookdao.save(result);
 		}
-		if (existed(req, result) && (StringUtils.hasText(newName)) ) {
+		if (existed(req, result) && (StringUtils.hasText(newName))) {
 			result.setName(newName);
-//			bookdao.save(result);
+			bookdao.save(result);
 		}
 		if (existed(req, result) && (StringUtils.hasText(newreqisbn))) {
+			bookdao.deleteById(reqisbn);
 			result.setIsbn(newreqisbn);
-//			bookdao.save(result);
+			bookdao.save(result);
 		}
 		if (existednum(req, result)) {
 			result.setPrice(reqprice);
-//			bookdao.save(result);
+			bookdao.save(result);
 		}
 		if (existednum(req, result)) {
 			result.setSaleAmount(reqsaleAmount);
-//			bookdao.save(result);
+			bookdao.save(result);
 		}
 		if (existednum(req, result)) {
 			result.setStock(reqstock);
-//			bookdao.save(result);
+			bookdao.save(result);
 		}
-
-		bookdao.save(result);
 
 		return new BookResponse("update info");
 
