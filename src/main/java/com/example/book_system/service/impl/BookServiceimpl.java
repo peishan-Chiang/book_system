@@ -52,11 +52,7 @@ public class BookServiceimpl implements BookService {
 
 	@Override
 	public BookResponse alterData(BookRequest req) {
-
-		
-			
-			
-			//基本資料
+		//基本資料
 			String reqisbn = req.getIsbn();
 			String reqname = req.getName();
 			String reqauthor = req.getAuthor();
@@ -75,7 +71,7 @@ public class BookServiceimpl implements BookService {
 			String reqclassify = req.getClassify();
 
 			if (!StringUtils.hasText(reqisbn) || !StringUtils.hasText(reqname) || !StringUtils.hasText(reqauthor)) {
-				return new BookResponse("404,name,ISBN,author,classify is empty");
+				return new BookResponse("404,name,ISBN,author,basic info is empty");
 			}
 
 			Optional<Book> op = bookdao.findById(reqisbn);
