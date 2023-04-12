@@ -68,7 +68,7 @@ public class BookServiceimpl implements BookService {
 			Integer reqprice = req.getPrice();
 			Integer reqstock = req.getStock();
 			Integer reqsaleAmount = req.getSaleAmount();
-			String reqclassify = req.getClassify();
+//			String reqclassify = req.getClassify();
 
 			if (!StringUtils.hasText(reqisbn) || !StringUtils.hasText(reqname) || !StringUtils.hasText(reqauthor)) {
 				return new BookResponse("404,name,ISBN,author,basic info is empty");
