@@ -15,25 +15,25 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class Book {
 	@Id
 	@Column(name="isbn")
-	private String isbn;
+	private String isbn;//書籍isbn
 	
 	@Column(name="name")
-	private String name;
+	private String name;//書名
 	
 	@Column(name="author")
-	private String author;
+	private String author;//作者
 	
 	@Column(name="price")
-	private Integer price;
+	private Integer price;//價格
 	
 	@Column(name="stock")
-	private Integer stock;
+	private Integer stock;//庫存
 
 	@Column(name="sale_amount")
-	private Integer saleAmount;
+	private Integer saleAmount;//數本銷售量
 	
 	@Column(name="classify")
-	private String classify;
+	private String classify;//書籍分類
 
 	
 

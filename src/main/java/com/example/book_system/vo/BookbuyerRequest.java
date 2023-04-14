@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class BookbuyerRequest {
 	
 	@JsonProperty("buy_list")
-	private Map<String,Integer> buymap;
+	private Map<String,Integer> buymap;//購書的map清單，isbn(品項):數量
 
 	public Map<String, Integer> getBuymap() {
 		return buymap;
