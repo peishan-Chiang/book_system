@@ -17,6 +17,7 @@ public class BookResponse {
 
 	@JsonProperty("buy_list")
 	private Map<String, Integer> buymap;
+	
 	private Integer totalPrice;
 
 	private String classify;// 分類
@@ -220,6 +221,10 @@ public class BookResponse {
 
 	public void setNum(Integer num) {
 		this.num = num;
+	}
+
+	public String getClassify() {
+		return classify;
 	}
 
 //	private List<String> classlist;

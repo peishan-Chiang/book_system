@@ -3,6 +3,7 @@ package com.example.book_system.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +14,8 @@ import com.example.book_system.vo.BookRequest;
 import com.example.book_system.vo.BookResponse;
 import com.example.book_system.vo.BookbuyerRequest;
 
+
+@CrossOrigin
 @RestController
 public class BookController {
 	@Autowired
@@ -31,7 +34,7 @@ public class BookController {
 	}
 
 	@PostMapping("/find_By_Classify_Containing") // 針對分類欄位模糊搜尋
-	public List<Book> findByClassifyContaining(@RequestBody BookRequest req) {
+	public BookResponse findByClassifyContaining(@RequestBody BookRequest req) {
 		return bookservice.findByClassifyContaining(req.getClassify());
 
 	}

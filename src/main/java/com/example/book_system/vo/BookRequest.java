@@ -9,7 +9,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BookRequest {
 
-
+//
+	@JsonProperty("classify_list")
+	private List<String> classlist;
 	@JsonProperty("book_info")
 	private Book book; //(輸入)請求單筆book所有欄位資料
 
@@ -141,27 +143,25 @@ public class BookRequest {
 		this.newName = newName;
 	}
 
-//	@JsonProperty("classify_list")
-//	private List<String> classlist;
-//
-//	public BookRequest(Book book, List<String> classlist2) {
-//		super();
-//		this.book = book;
-//		this.classlist = classlist2;
-//	}
 
-//	public BookRequest(List<String> classlist, String classify) {
-//	super();
-//	this.classlist = classlist;
-//	this.classify = classify;
-//}
-//
-//public List<String> getClasslist() {
-//	return classlist;
-//}
-//
-//public void setClasslist(List<String> classlist) {
-//	this.classlist = classlist;
-//}
+	public BookRequest(Book book, List<String> classlist2) {
+		super();
+		this.book = book;
+		this.classlist = classlist2;
+	}
+
+	public BookRequest(List<String> classlist, String classify) {
+	super();
+	this.classlist = classlist;
+	this.classify = classify;
+}
+
+public List<String> getClasslist() {
+	return classlist;
+}
+
+public void setClasslist(List<String> classlist) {
+	this.classlist = classlist;
+}
 
 }

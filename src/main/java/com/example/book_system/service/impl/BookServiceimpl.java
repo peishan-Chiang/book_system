@@ -33,11 +33,13 @@ public class BookServiceimpl implements BookService {
 		// 前端增加的書單
 		List<Book> bookList = req.getBooklist();
 
+		List<String> bookNumClass = new ArrayList<>();// 第幾本的分類
+
 		for (Book item : bookList) {
 
 			// 如果String 沒有填寫基本資料作回傳錯誤
 			if (!StringUtils.hasText(item.getName()) || !StringUtils.hasText(item.getIsbn())
-					|| !StringUtils.hasText(item.getAuthor()) || !StringUtils.hasText(item.getClassify())) {
+					|| !StringUtils.hasText(item.getAuthor())) {
 				return new BookResponse("404,name,ISBN,author,classify is empty");
 			}
 			// 用isbn確認，拒絕重複，加入錯誤清單
@@ -45,12 +47,30 @@ public class BookServiceimpl implements BookService {
 				errorList.add(item);
 			}
 
+			StringBuffer sBuffer = new StringBuffer();
+
+			bookNumClass.addAll(item.getClassifyList());// 第一本書的分類 [A,B,C]
+			for (String Num : bookNumClass) {
+				sBuffer.append(Num);
+				sBuffer.append(";");
+				if (!StringUtils.hasText(Num)) {
+					break;
+				}
+
+			}
+			String itemClassify = "";
+			itemClassify = sBuffer.toString();// 字串{A;B;C}
+			bookNumClass.clear();
+			item.setClassify(itemClassify);
+
 		}
+
 		// 錯誤清單存在值，跳出訊息。
 		if (!errorList.isEmpty()) {
 			return new BookResponse(errorList, "ISBN existed");
 
 		}
+
 		// 沒錯誤訊息跳出，作資料新增，及訊息丟回
 		bookdao.saveAll(bookList);
 		return new BookResponse("add,successed!!");
@@ -68,10 +88,13 @@ public class BookServiceimpl implements BookService {
 		String newIsbn = req.getNewIsbn();
 		String newAuthor = req.getNewAuthor();
 		String newName = req.getNewName();
-		String newClassify = req.getClassify();
 		Integer newPrice = req.getPrice();
 		Integer newStock = req.getStock();
 		Integer newSaleAmount = req.getSaleAmount();
+//		String newClassify = req.getClassify();
+//		new清單放我的分類資料
+		List<String> classlist = req.getClasslist();
+		List<String> existedList = new ArrayList<>();
 
 		// 針對資料庫NON NULL基本資料作確認。
 		if (!StringUtils.hasText(reqIsbn) || !StringUtils.hasText(reqName) || !StringUtils.hasText(reqAuthor)) {
@@ -90,11 +113,43 @@ public class BookServiceimpl implements BookService {
 			result.setAuthor(newAuthor);
 			bookdao.save(result);
 		}
-		// 如果有下新資料請求，且前面的基本資料有打，就讓他作資料新增
-		if ((StringUtils.hasText(newClassify) && !(result.getClassify().equals(newClassify)))) {
-			result.setClassify(newClassify);
-			bookdao.save(result);
+//		// 如果有下新資料請求，且前面的基本資料有打，就讓他作資料新增
+//		if ((StringUtils.hasText(newClassify) && !(result.getClassify().equals(newClassify)))) {
+//			result.setClassify(newClassify);
+//			bookdao.save(result);
+//		}
+//		=========
+
+		String string = " ";
+		result.setClassify(string);
+		bookdao.save(result);
+		String existedClissify = result.getClassify().trim();// 已經有的Classify
+		String[] strExistedClassify = existedClissify.split(";");// 將{A;B;C}拆成單一筆數清單(已存在)
+		for (String existedItem : strExistedClassify) {
+			existedList.add(existedItem);
+
 		}
+
+		if (classlist.isEmpty()) {
+			return new BookResponse("request class list null");
+		} else {
+
+			if (existedList.equals(classlist)) {
+				return new BookResponse("unneeded");
+			} else {
+
+				for (String newAdd : classlist) {
+					string = newAdd + ";" + string;
+				}
+				string = string.trim();
+				result.setClassify(string);
+				bookdao.save(result);
+			}
+
+		}
+
+//		==========
+
 		// 如果有下新資料請求，且前面的基本資料有打，就讓他作資料新增
 		if ((StringUtils.hasText(newName) && !(result.getName().equals(newName)))) {
 			result.setName(newName);
@@ -109,18 +164,18 @@ public class BookServiceimpl implements BookService {
 		}
 
 		// 如果有下新資料請求，且前面的基本資料有打，就讓他作資料新增
-		if (existednum(req, result)) {
+		if (existednum(req, result) && (int) newPrice != 0) {// 0應該要防呆int=0(null)類似null
 			result.setPrice(newPrice);
 			bookdao.save(result);
 		}
 
 		// 如果有下新資料請求，且前面的基本資料有打，就讓他作資料新增
-		if (existednum(req, result)) {
+		if (existednum(req, result) && (int) newSaleAmount != 0) {// 0應該要防呆int=0(null)類似null
 			result.setSaleAmount(newSaleAmount);
 			bookdao.save(result);
 		}
 		// 如果有下新資料請求，且前面的基本資料有打，就讓他作資料新增
-		if (existednum(req, result)) {
+		if (existednum(req, result) && (int) newStock != 0) {// 0應該要防呆int=0(null)類似null
 			result.setStock(newStock);
 			bookdao.save(result);
 		}
@@ -176,10 +231,15 @@ public class BookServiceimpl implements BookService {
 //	===================================================================
 	// 針對分類欄位去搜尋關鍵字
 	@Override
-	public List<Book> findByClassifyContaining(String classify) {
+	public BookResponse findByClassifyContaining(String classify) {
 		// new 空白清單，後面放要提供的結果
 		List<Book> result = new ArrayList<>();
+
 		// 將我查詢到的分類放到list <book>格式
+		// 確認!hastext. classify 有值
+		if (!StringUtils.hasText(classify)) {
+			return new BookResponse("沒有輸入任何值");
+		}
 		List<Book> bookList = bookdao.findByClassifyContaining(classify);
 		// 我將分類+銷售額資料設定null，放到result清單
 		for (Book item : bookList) {
@@ -188,7 +248,7 @@ public class BookServiceimpl implements BookService {
 			result.add(item);
 		}
 
-		return result;
+		return new BookResponse(result, "搜尋成功");
 
 	}
 //====================================================================================
@@ -198,12 +258,39 @@ public class BookServiceimpl implements BookService {
 		// new 空白清單，後面放要提供的結果
 		List<Book> result = new ArrayList<>();
 		// 針對姓名+isbn+作者，其中任一欄位下關鍵字都搜尋
-		List<Book> bookList = bookdao.findByNameContainingOrIsbnContainingOrAuthorContaining(req.getName(),
-				req.getIsbn(), req.getAuthor());
+		List<Book> collect = new ArrayList<>();
+		List<Book> bookList = new ArrayList<>();
+		
+		
+	
+		
+		
+		if (StringUtils.hasText(req.getAuthor()) && StringUtils.hasText(req.getIsbn())
+				&& StringUtils.hasText(req.getName())) {
+			bookList = bookdao.findByNameContainingOrIsbnContainingOrAuthorContaining(req.getName(), req.getIsbn(),
+					req.getAuthor());
+		} 
+		
+		if (!StringUtils.hasText(req.getAuthor()) && !StringUtils.hasText(req.getIsbn())
+				&& !StringUtils.hasText(req.getName())) {
+			return new BookResponse("任何欄位都沒有值");
+		} 
+		
+		
+		if (StringUtils.hasText(req.getAuthor())) {
+			bookList = bookdao.findByAuthorContaining(req.getAuthor());
+		}
+		if (StringUtils.hasText(req.getIsbn())) {
+			bookList = bookdao.findByIsbnContaining(req.getIsbn());
+		}
+		if (StringUtils.hasText(req.getName())) {
+			bookList = bookdao.findByNameContaining(req.getName());
+		}
 
 		// 消費者情況
 		if (isUser) {
 			// 將庫存數量、銷售量、分類作null，加到新清單，讓他看不到
+
 			for (Book item : bookList) {
 				item.setStock(null);
 				item.setSaleAmount(null);
@@ -216,6 +303,7 @@ public class BookServiceimpl implements BookService {
 		}
 		// 不是消費者情況(書商)
 		for (Book item : bookList) {
+
 			item.setClassify(null);
 			result.add(item);
 		}
@@ -351,31 +439,29 @@ public class BookServiceimpl implements BookService {
 			int itemTotalPrice = 0;// 買完總價 :(單價*數量)
 			int price = book.getPrice();// 單價
 
-			itemTotalPrice = price * item.getValue();//單一品項的總價
-			totalPrice += itemTotalPrice;//不同品項間的累加總價
-			totalNum += num;//最後總共買下(不同品項間)的書數量
+			itemTotalPrice = price * item.getValue();// 單一品項的總價
+			totalPrice += itemTotalPrice;// 不同品項間的累加總價
+			totalNum += num;// 最後總共買下(不同品項間)的書數量
 
-		}
+//		// 計算個別書名的庫存減少與增加
+//		for (Book bookitem : finalSelectList) {
+			// 表示該品項，原銷售量新增當下銷售的數量，為新銷售量
+			int newSale = book.getSaleAmount() + num;// 因為Map
+			book.setSaleAmount(newSale);
 
-		// 計算個別書名的庫存減少與增加
-		for (Book bookitem : finalSelectList) {
-			//表示該品項，原銷售量新增當下銷售的數量，為新銷售量
-			int newSale = bookitem.getSaleAmount() + num;
-			bookitem.setSaleAmount(newSale);
-			
-			//表示該品項，原庫存量扣除當下銷售的數量，為新庫存量
-			int newStock = bookitem.getStock() - num;
-			bookitem.setStock(newStock);
+			// 表示該品項，原庫存量扣除當下銷售的數量，為新庫存量
+			int newStock = book.getStock() - num;
+			book.setStock(newStock);
 			// 如果沒庫存，不讓銷售
 			if (newStock < 0) {
 				return new BookResponse("404,non stock");
 			}
 			// 如果有庫存，將新庫存資料及銷售量資料更新
-			bookdao.save(bookitem);
+			bookdao.save(book);
 			// 將新庫存資料及銷售量資料更新後，加入新清單，去作呈現的格式調整
-			stockAndSalesRecordList.add(bookitem);
-
+			stockAndSalesRecordList.add(book);
 		}
+
 		// 將新每筆的庫存，銷售量，分類作null，不讓畫面呈現
 		for (Book item : stockAndSalesRecordList) {
 			item.setStock(null);

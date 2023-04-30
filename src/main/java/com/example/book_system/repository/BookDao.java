@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.book_system.entity.Book;
 
-@ Repository
+@Repository
 public interface BookDao extends JpaRepository<Book,String> {
 		
 
@@ -18,7 +18,17 @@ public interface BookDao extends JpaRepository<Book,String> {
 		List <Book> findByClassifyContaining(String classify);
 //		姓名，isbn，作者欄位模糊搜尋
 		List <Book> findByNameContainingOrIsbnContainingOrAuthorContaining(String name, String isbn,String author);
-//		銷售量由大到小排名且取前五筆
+		List <Book> findByNameContaining(String name);
+		List <Book> findByIsbnContaining( String isbn);
+		List <Book> findByAuthorContaining( String isbn);
+		
+		
+		
+		
+		
+		
+		
+		//		銷售量由大到小排名且取前五筆
 		List<Book> findTop5ByOrderBySaleAmountDesc();
 		
 	}

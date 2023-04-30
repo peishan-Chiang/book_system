@@ -11,7 +11,7 @@ public interface BookService {
  
 	public BookResponse addData(BookRequest req) ;//基本資料建置
     public BookResponse alterData(BookRequest req) ;//修改資料
-	public List <Book> findByClassifyContaining(String classify);//根據分類去作搜尋(DAO模糊收尋:種類)
+	public BookResponse findByClassifyContaining(String classify);//根據分類去作搜尋(DAO模糊收尋:種類)
 	public BookResponse getUserBookInfo(BookRequest req) ; //書籍搜尋(消費者)
 	public BookResponse getPublisherBookInfo(BookRequest req) ;//書籍搜尋(書籍商)
 	public BookResponse updateStockInfo(BookRequest req) ;//更新庫存資料(進貨)

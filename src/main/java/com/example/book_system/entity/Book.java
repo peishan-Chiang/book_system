@@ -1,11 +1,16 @@
 package com.example.book_system.entity;
 
+
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -36,6 +41,11 @@ public class Book {
 	private String classify;//書籍分類
 
 	
+//	private List<String> classifyList;
+	
+	@JsonProperty("classitfy_List")
+	@Transient
+	private List<String> classifyList;
 
 	public Book(String isbn, String name, String author, Integer price, Integer stock, Integer saleAmount, String classify) {
 		super();
@@ -116,9 +126,15 @@ public class Book {
 	public void setClassify(String classify) {
 		this.classify = classify;
 	}
+
+	public List<String> getClassifyList() {
+		return classifyList;
+	}
+
+	public void setClassifyList(List<String> classifyList) {
+		this.classifyList = classifyList;	
 	
 	
-	
-	
+	}
 	
 }
